@@ -1,0 +1,2 @@
+# zig-prime-number-generator
+
