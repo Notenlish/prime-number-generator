@@ -119,6 +119,7 @@ bool cached_is_prime(int **cache, int value)
     return true;
 }
 
+// sieve of eratosthenes
 void eratosthenes_prime_gen(int **results, int n)
 {
     // A an array of Boolean values, indexed by integers 2 to n, initially all set to true.
@@ -146,3 +147,65 @@ void eratosthenes_prime_gen(int **results, int n)
         }
     }
 }
+
+// TODO: 
+
+void pritchard_prime_gen(int **results, int n) {
+    if (n <2) return;
+
+    // W contains current candidates that haven't been eliminated yet.
+    // length = minimum of Pk,N  
+
+    int k = 1;
+
+    int *W = NULL;
+    arrput(W, 1);
+
+    int length = 2;
+    int p = 3;  // p = pk+1 (p is always the next prime we are about to process)
+    int *Pr = NULL;  // Pr = the primes up to pk(primes we have found already)
+    arrput(Pr, 2);
+
+    while (p*p <= n) {
+        if (length < n) {
+            // extend W, length to minimum of p*length, N;
+        }
+        // delete multiples of p from W;
+        // insert p into Pr;
+        // k = k+1;
+        // p = next(w, 1);
+    }
+    if (length < n) {
+        // extend W, length to N;
+    }
+
+    // return Union of Pr and W - {1}
+}
+
+void pritchard_extend() {
+    // {in: W = Wk and length = Pk and n > length}
+    // {out: W = Wk → n and length = n}
+
+    int w = 1;
+    int x = length +1;
+
+    while (x <= n) {
+        // Insert x into W;
+        w = // next(W,w);
+        x = //length + w;
+    }
+    length = n;
+}
+
+void pritchard_delete() {
+    int w;
+    w = p;
+    while (p*w <= length) {
+        w = // next(W,w);
+    }
+    while (w > 1) {
+        w = // prev(W, w);
+        // remove p*w from W;
+    }
+}
+

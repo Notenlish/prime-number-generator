@@ -11,3 +11,8 @@ and use this to build:
 cd c
 zig cc main.c -o main.exe
 ```
+
+
+## a
+https://en.wikipedia.org/wiki/Sieve_of_Pritchard
+https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
