@@ -69,3 +69,9 @@ Just run the code.
 Change the `upto` variable in the code for different limit values, that way you can check how algorithms scale.
 
 There is also a graph.py which will visualize it, but you need to put the data in there manually.
+
+
+## License
+
+MIT
+the stb_ds.h code is in public domain data structures - Sean Barrett 2019
