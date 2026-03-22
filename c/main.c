@@ -144,16 +144,11 @@ bool better_is_prime(int value)
 
 void cached_prime_gen(int **cache, int **arr, int start, int upto)
 {
-    bool val_prime = cached_is_prime(cache, start);
-    if (val_prime)
-    {
-        arrput(*arr, start);
+    for (int i = start; i <= upto; i++) {
+        if(cached_is_prime(cache, i)) {
+            arrput(*arr,i);
+        }
     }
-    if (start == upto)
-    {
-        return;
-    }
-    cached_prime_gen(cache, arr, start + 1, upto);
 }
 
 bool cached_is_prime(int **cache, int value)
