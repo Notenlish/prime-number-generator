@@ -1,6 +1,8 @@
 # prime-number-generator
 I first tried this in Zig but didnt understand anything so now its using C.
 
+It generated primes.
+
 ## Building
 I use zig cc to build
 
