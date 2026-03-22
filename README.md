@@ -48,6 +48,10 @@ Also the original "basic" and "cached" algorithms were using recursion which jus
 
 Pritchard's Sieve was really slow because I tried to translate the pseudocode to C but the way I setup the next/prev functions and some other stuff like me using arrdel led it to being really slow. Now its faster thankfully.
 
+I didnt record how fast certain algorithms were before changing them but Pritchards sieve was like 6s for like 160k items or smth, and now its 0.22 seconds so a lot faster ig.
+
+Peak mem usage is 51mb with 6% cpu(the code is single threaded) for me.
+
 
 ## Some Useful Links
 https://en.wikipedia.org/wiki/Sieve_of_Pritchard
