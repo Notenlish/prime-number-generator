@@ -8,33 +8,35 @@ I use zig cc to build
 
 You need to install [zig](https://ziglang.org/).
 
-and use this to build:
+make sure zig is added to the PATH(ie the zig command works when you type it in a terminal). 
 
-```
-cd src
-zig cc main.c -o main.exe 
-```
+run the `build.py` script to build the code.
 
-dont add .exe if you're not on windows.
+for windows:
+`py build.py`
+for linux:
+`python3 build.py`
 
 ### Cross Compiling
 
-To cross compile you need to add this argument:
-`-target [platform]`
+The build script takes care of this.
 
-available platforms:
+
+## Graph
+
+To graph the data you need to run the graph.py script. The required dependencies are matplotlib and numpy.
+
+Use this to install the dependencies. 
+
+`pip install matplotlib numpy`
+
+if you dont want to pollute your global environment or you are on Mac/Linux do this:
+
 ```
-aarch64-windows-gnu
-x86_64-windows-gnu
-x86_64-windows-msvc
-x86_64-linux-gnu
-aarch64-linux-gnu
-x86_64-macos
-aarch64-macos
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
-
-to run it just do this: `./[name of executable]`
-
 
 
 ## Some Useful Links
