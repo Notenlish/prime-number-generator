@@ -24,7 +24,7 @@ int main()
     clock_t end_time;
 
     int start = 2;
-    const int upto = 4.0 * 1000 * 1000;
+    const int upto = 1.0 * 1000 * 1000;
 
     int *arr = NULL;
     int *cache = NULL;
