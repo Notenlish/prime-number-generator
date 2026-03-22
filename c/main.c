@@ -13,12 +13,6 @@ bool cached_is_prime(int **cache, int value);
 void cached_prime_gen(int **cache, int **arr, int start, int upto);
 void eratosthenes_prime_gen(int **results, int n);
 void pritchard_prime_gen(int **results, int n);
-void pritchard_delete(int length, int p, int **W);
-void pritchard_extend(int *length, int **W, int n);
-bool contains_in_arr(int *arr, int value);
-int *array_union(int *a, int *b);
-int next(int *W, int current);
-int prev(int *W, int current);
 void atkin_prime_gen(int **results, int limit);
 void sundaram_prime_gen(int **results, int n);
 
@@ -30,7 +24,7 @@ int main()
     clock_t end_time;
 
     int start = 2;
-    const int upto = 80 * 1000;
+    const int upto = 4.0 * 1000 * 1000;
 
     int *arr = NULL;
     int *cache = NULL;
@@ -229,8 +223,13 @@ void pritchard_prime_gen(int **results, int n)
 
     int k = 1;
 
-    int *W = NULL;
-    arrput(W, 1);
+    // use bool arr instead of int. W[x] == true means its a candidate
+    bool *W = NULL;
+    arrsetlen(W, n+1);
+    for (int i=0; i<(n+1); i++) {
+        W[i] = false;
+    }
+    W[1]=true;
 
     int length = 2;
     int p = 3;      // p = pk+1 (p is always the next prime we are about to process)
@@ -239,149 +238,81 @@ void pritchard_prime_gen(int **results, int n)
 
     while (p * p <= n)
     {
-        if (length < n)
+        // step 2: extend W up to min(p * length, n)
+        long long new_length_64bit = (long long)p*(long long)length;
+        int new_length = (new_length_64bit > n) ? n : (int)new_length_64bit;
+
+        for (int i = 1; i <= length; i++)
         {
-            // extend W, length to minimum of p*length, N;
-            pritchard_extend(&length, &W, n);
+            if (W[i])  // is candidate
+            {
+                for (int k = i; k <= new_length; k += length)
+                {
+                    W[k] = true;
+                }
+            }
         }
-        // delete multiples of p from W;
-        pritchard_delete(length, p, &W);
-        arrput(Pr, p); // insert p into Pr
-        k = k + 1;
-        p = next(W, 1); // next(W, 1)
+
+        length = new_length;
+
+        // get rid of multiples of p
+        for (int w = p; w*p<= length; w++) {
+            if (W[w]) {
+                W[p*w] = false;
+            }
+        }
+
+        arrput(Pr, p);
+
+        // find next p(next element thats bigger than 1 in the W arr)
+        int found = 0;
+        for (int i=p+1; i<=length;i++) {
+            if (W[i]) {
+                p = i;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {break;}
     }
+
     if (length < n)
     {
-        // extend W, length to N;
-        pritchard_extend(&length, &W, n);
+        for (int i =1; i<= length; i++) {
+            if (W[i]) {
+                for (int k=i; k<= n; k+= length) {
+                    W[k] = true;
+                }
+            }
+        }
+        length = n;
     }
 
-    int len_W = arrlen(W);
-    int len_Pr = arrlen(Pr);
-    int *arr_to_use = NULL;
-    int *other_array = NULL;
-    if (len_W > len_Pr)
-    {
-        arr_to_use = W;
-        other_array = Pr;
-    }
-    else
-    {
-        arr_to_use = Pr;
-        other_array = W;
+    int *final =NULL;
+
+    for (int i=2;i<=n;i++) {
+        if (W[i]) {
+            arrput(final, i);
+        }
     }
 
-    // return union of Pr and W - {1}
-    int *final = array_union(Pr, W);
+    // add missing primes from Pr
+    for (int i=0;i<arrlen(Pr);i++) {
+        int v = Pr[i];
+        bool exists = false;
 
-    // remove the 1
-    for (int i = 0; i < arrlen(final); i++)
-    {
-        if (final[i] == 1)
-        {
-            arrdel(final, i);
-            break;
+        for (int j = 0; j < arrlen(final); j++){
+            if(final[j] == v) {
+                exists=true;
+                break;
+            }
+        }
+        if (!exists) {
+            arrput(final,v);
         }
     }
 
     *results = final;
-}
-
-void pritchard_extend(int *length, int **W, int n)
-{
-    // {in: W = Wk and length = Pk and n > length}
-    // {out: W = Wk → n and length = n}
-
-    int w = 1;
-    int x = *length + 1;
-
-    while (x <= n)
-    {
-        arrput((*W), x); // Insert x into W
-        w = next(*W, w); // next(W,w);
-        x = *length + w;
-    }
-    *length = n;
-}
-
-void pritchard_delete(int length, int p, int **W)
-{
-    int w;
-    w = p;
-    while (p * w <= length)
-    {
-        w = next(*W, w); // next(W,w);
-    }
-    while (w > 1)
-    {
-        w = prev(*W, w); // prev(W, w);
-        // remove p*w from W;
-        for (int i = 0; i < arrlen(*W); i++)
-        {
-            if ((*W)[i] == p * w)
-            {
-                arrdel(*W, i);
-                break;
-            }
-        }
-    }
-}
-
-bool contains_in_arr(int *arr, int value)
-{
-    for (int i = 0; i < arrlen(arr); i++)
-    {
-        if (arr[i] == value)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-int *array_union(int *a, int *b)
-{
-    int *result = NULL;
-
-    // add elements from a
-    for (int i = 0; i < arrlen(a); i++)
-    {
-        arrput(result, a[i]);
-    }
-
-    // add elements from b if they dont exist
-    for (int i = 0; i < arrlen(b); i++)
-    {
-        if (!contains_in_arr(result, b[i]))
-        {
-            arrput(result, b[i]);
-        }
-    }
-    return result;
-}
-
-int next(int *W, int current)
-{
-    for (int i = 0; i < arrlen(W); i++)
-    {
-        if (W[i] == current && i + 1 < arrlen(W))
-        {
-            return W[i + 1];
-        }
-    }
-    return -1;
-}
-
-int prev(int *W, int value)
-{
-    for (int i = 0; i < arrlen(W); i++)
-    {
-        if (W[i] == value && i - 1 >= 0)
-        {
-            return W[i - 1];
-        }
-    }
-    return -1;
 }
 
 void atkin_prime_gen(int **results, int limit)
@@ -478,7 +409,8 @@ void sundaram_prime_gen(int **results, int n)
     for (int i = 1; i < k + 1; i++)
     {
         int j = i;
-        while (i + j + 2 * i * j <= k)
+        // fix overflow by using long long(forced 64bit)
+        while ((long long)i + j + (long long)2 * i * j <= k)
         {
             marked[i + j + 2 * i * j] = true;
             j += 1;
