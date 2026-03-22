@@ -14,5 +14,10 @@ zig cc main.c -o main.exe
 
 
 ## a
-https://en.wikipedia.org/wiki/Sieve_of_Pritchard
-https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes
+https://en.wikipedia.org/wiki/Sieve_of_Pritchard (pseudocode)
+
+https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes (pseudocode)
+
+https://en.wikipedia.org/wiki/Sieve_of_Atkin ( converted from java to c)
+
+https://en.wikipedia.org/wiki/Sieve_of_Sundaram ( python to c)
