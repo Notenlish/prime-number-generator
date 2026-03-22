@@ -22,27 +22,27 @@ void sundaram_prime_gen(int **results, int n);
 
 int main()
 {
-    printf("Hello World!\n");
-    printf("Hello World!\n");
+    printf("Starting tests!\n");
 
     clock_t start_time;
     clock_t end_time;
-    
+
     int start = 2;
-    const int upto = 40 * 1000;
-    
+    const int upto = 80 * 1000;
+
     int *arr = NULL;
     int *cache = NULL;
-    
+
     start_time = clock();
     basic_prime_gen(&arr, start, upto);
     end_time = clock();
     printf("basic: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
 
     printf("aaa!\n");
-    
+
     //
 
+    arr = NULL;
     start_time = clock(); // Get the current time
     cached_prime_gen(&cache, &arr, start, upto);
     end_time = clock(); // Get the current time
@@ -52,12 +52,21 @@ int main()
 
     int *results = NULL;
     start_time = clock();
+    eratosthenes_prime_gen(&results, upto);
+    end_time = clock();
+    printf("eratosthenes: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+
+    //
+
+    results = NULL;
+    start_time = clock();
     pritchard_prime_gen(&results, upto);
     end_time = clock();
     printf("pritchard: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
 
     //
 
+    results = NULL;
     start_time = clock();
     atkin_prime_gen(&results, upto);
     end_time = clock();
@@ -65,11 +74,11 @@ int main()
 
     //
 
+    results = NULL;
     start_time = clock();
     sundaram_prime_gen(&results, upto);
     end_time = clock();
     printf("sundaram: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
-
 
     return 0;
 }
