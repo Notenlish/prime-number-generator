@@ -38,6 +38,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Optimization
+
+The "better" algorithm is optimized by changing the function for checking whether something is a prime. Instead of checking for every value from 2 to v, I instead check every value from 2 to square root of v. For n = 250k the better algorithm is roughly 90x faster.
+
+I also tried caching but that was actually slower than the "better" algorithm.
+
+Also the original "basic" and "cached" algorithms were using recursion which just led to the program terminating randomly after n was like 80k which was a problem. Appearently C does not like recursion very much. I had to convert the recursion into a normal function.
+
+Pritchard's Sieve was really slow because I tried to translate the pseudocode to C but the way I setup the next/prev functions and some other stuff like me using arrdel led it to being really slow. Now its faster thankfully.
+
 
 ## Some Useful Links
 https://en.wikipedia.org/wiki/Sieve_of_Pritchard
