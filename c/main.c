@@ -7,6 +7,8 @@
 
 void basic_prime_gen(int **arr, int start, int upto);
 bool basic_is_prime(int value);
+void better_prime_gen(int **arr, int start, int upto);
+bool better_is_prime(int value);
 bool cached_is_prime(int **cache, int value);
 void cached_prime_gen(int **cache, int **arr, int start, int upto);
 void eratosthenes_prime_gen(int **results, int n);
@@ -37,6 +39,14 @@ int main()
     basic_prime_gen(&arr, start, upto);
     end_time = clock();
     printf("basic: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+
+    //
+
+    arr = NULL;
+    start_time = clock();
+    better_prime_gen(&arr, start, upto);
+    end_time = clock();
+    printf("better: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
 
     //
 
@@ -103,6 +113,31 @@ bool basic_is_prime(int value)
             return false;
         }
         i += 1;
+    }
+    return true;
+}
+
+void better_prime_gen(int **arr, int start, int upto)
+{
+    for (int i = start; i <= upto; i++)
+    {
+        if (better_is_prime(i))
+        {
+            arrput(*arr, i);
+        }
+    }
+}
+
+bool better_is_prime(int value)
+{
+    if (value < 2) {return false;}
+
+    for (int i = 2; i*i <= value; i++)
+    {
+        if (value % i == 0)
+        {
+            return false;
+        }
     }
     return true;
 }
