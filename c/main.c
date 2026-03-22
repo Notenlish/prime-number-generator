@@ -38,8 +38,6 @@ int main()
     end_time = clock();
     printf("basic: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
 
-    printf("aaa!\n");
-
     //
 
     arr = NULL;
@@ -85,17 +83,13 @@ int main()
 
 void basic_prime_gen(int **arr, int start, int upto)
 {
-    bool val_prime = basic_is_prime(start);
-    if (val_prime)
+    for (int i = start; i <= upto; i++)
     {
-        arrput(*arr, start);
+        if (basic_is_prime(i))
+        {
+            arrput(*arr, i);
+        }
     }
-
-    if (start > upto)
-    {
-        return;
-    }
-    basic_prime_gen(arr, start + 1, upto);
 }
 
 bool basic_is_prime(int value)
