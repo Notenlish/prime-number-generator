@@ -1,4 +1,7 @@
 import os
+import zipfile
+import pathlib
+import shutil
 
 platforms = {
     "main-windows-arm.exe":"aarch64-windows-gnu",
@@ -9,7 +12,20 @@ platforms = {
     "main-macos-arm":"aarch64-macos",
 }
 
+if not pathlib.Path("build").exists():
+    pathlib.Path.mkdir("build")
+if not pathlib.Path("dist").exists():
+    pathlib.Path.mkdir("dist")
+
 for name,platform in platforms.items():
-    os.system(f"zig cc src/main.c -o dist/{name} -target {platform}")
+    print(f"Building for {name}.")
+    os.system(f"zig cc src/main.c -o build/{name} -target {platform}")
+
+    print(f"Zipping release for {name}.")
+
+    zip = zipfile.ZipFile(f"dist/{name}.zip", "w", zipfile.ZIP_DEFLATED)
+    zip.write(f"build/{name}", name)
+    zip.write("graph.py")
+    zip.close
 
 print("Done!")

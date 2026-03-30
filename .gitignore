@@ -8,3 +8,7 @@ main-linux-arm
 main-linux-x86
 main-macos-arm
 main-macos-x86
+dist/
+build/
+results.csv
+graph.png

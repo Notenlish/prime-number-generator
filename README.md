@@ -1,7 +1,15 @@
 # prime-number-generator
 I first tried this in Zig but didnt understand anything so now its using C.
 
-It generated primes.
+It generates primes up to a limit.
+
+## How To Run
+Extract the zip from the releases.
+
+Just run the executable, it does everything for you and at the end you should have a graph of all the algorithms.
+
+You need to have python installed and available on PATH. Python venv creation and dependency management is handled automatically.
+
 
 ## Building
 I use zig cc to build
@@ -65,11 +73,7 @@ https://en.wikipedia.org/wiki/Sieve_of_Sundaram ( python to c)
 
 # Testing
 Just run the code.
-
-Change the `upto` variable in the code for different limit values, that way you can check how algorithms scale.
-
-There is also a graph.py which will visualize it, but you need to put the data in there manually.
-
+It will automatically show you the graph once its done running the algorithms.
 
 ## License
 

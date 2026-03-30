@@ -1,6 +1,17 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdlib.h> // used for system calls
+#include <sys/stat.h>
+
+#ifdef WIN32
+#include <windows.h>
+#elif _POSIX_C_SOURCE >= 199309L
+#include <time.h> // for nanosleep
+#else
+#include <unistd.h> // for usleep
+#endif
+
 
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
@@ -15,74 +26,172 @@ void eratosthenes_prime_gen(int **results, int n);
 void pritchard_prime_gen(int **results, int n);
 void atkin_prime_gen(int **results, int limit);
 void sundaram_prime_gen(int **results, int n);
+void display_graph();
+
+void sleep_ms(int milliseconds) { // cross-platform sleep function
+#ifdef WIN32
+    Sleep(milliseconds);
+#elif _POSIX_C_SOURCE >= 199309L
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = (milliseconds % 1000) * 1000000;
+    nanosleep(&ts, NULL);
+#else
+    if (milliseconds >= 1000)
+        sleep(milliseconds / 1000);
+    usleep((milliseconds % 1000) * 1000);
+#endif
+}
+
 
 int main()
 {
-    printf("Starting tests!\n");
+    printf("Starting tests! Running from n=10k to n=1 million.\n");
+    sleep_ms(500);
+    printf("*PLEASE* make sure python is installed and accessible via PATH(ie it works when you type py on windows and python3 on mac/linux). Otherwise there could be errors.\n");
+    sleep_ms(4000);
+
+    FILE *fptr;
+    fptr = fopen("results.csv", "w");
+    fprintf(fptr, "upto,basic,better,cached,eratosthenes,pritchard,atkin,sundaram\n");
 
     clock_t start_time;
     clock_t end_time;
 
-    int start = 2;
-    const int upto = 1.0 * 1000 * 1000;
+    int uptoArr[] = {
+        10 * 1000,
+        50 * 1000,
+        100 * 1000,
+        250 * 1000,
+        500 * 1000,
+        1 * 1000 * 1000
+    };
 
-    int *arr = NULL;
-    int *cache = NULL;
+    for (int u = 0; u < (sizeof(uptoArr) / sizeof(uptoArr[0])); u++)
+    {
+        double times[7] = {0, 0, 0, 0, 0, 0, 0};
+        double time_taken = 0;
 
-    start_time = clock();
-    basic_prime_gen(&arr, start, upto);
-    end_time = clock();
-    printf("basic: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        int start = 2;
+        const int upto = uptoArr[u];
+        int *arr = NULL;
+        int *cache = NULL;
 
-    //
+        printf("Starting test for n=%d\n", upto);
 
-    arr = NULL;
-    start_time = clock();
-    better_prime_gen(&arr, start, upto);
-    end_time = clock();
-    printf("better: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //  ---------------------------------  //
 
-    //
+        start_time = clock();
+        basic_prime_gen(&arr, start, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("basic: %f seconds\n", time_taken);
+        times[0] = time_taken;
 
-    arr = NULL;
-    start_time = clock(); // Get the current time
-    cached_prime_gen(&cache, &arr, start, upto);
-    end_time = clock(); // Get the current time
-    printf("cached: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //
 
-    //
+        arr = NULL;
+        start_time = clock();
+        better_prime_gen(&arr, start, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("better: %f seconds\n", time_taken);
+        times[1] = time_taken;
 
-    int *results = NULL;
-    start_time = clock();
-    eratosthenes_prime_gen(&results, upto);
-    end_time = clock();
-    printf("eratosthenes: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //
 
-    //
+        arr = NULL;
+        start_time = clock(); // Get the current time
+        cached_prime_gen(&cache, &arr, start, upto);
+        end_time = clock(); // Get the current time
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("cached: %f seconds\n", time_taken);
+        times[2] = time_taken;
 
-    results = NULL;
-    start_time = clock();
-    pritchard_prime_gen(&results, upto);
-    end_time = clock();
-    printf("pritchard: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //
 
-    //
+        int *results = NULL;
+        start_time = clock();
+        eratosthenes_prime_gen(&results, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("eratosthenes: %f seconds\n", time_taken);
+        times[3] = time_taken;
 
-    results = NULL;
-    start_time = clock();
-    atkin_prime_gen(&results, upto);
-    end_time = clock();
-    printf("atkin: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //
 
-    //
+        results = NULL;
+        start_time = clock();
+        pritchard_prime_gen(&results, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("pritchard: %f seconds\n", time_taken);
+        times[4] = time_taken;
 
-    results = NULL;
-    start_time = clock();
-    sundaram_prime_gen(&results, upto);
-    end_time = clock();
-    printf("sundaram: %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+        //
+
+        results = NULL;
+        start_time = clock();
+        atkin_prime_gen(&results, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("atkin: %f seconds\n", time_taken);
+        times[5] = time_taken;
+
+        //
+
+        results = NULL;
+        start_time = clock();
+        sundaram_prime_gen(&results, upto);
+        end_time = clock();
+        time_taken = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("sundaram: %f seconds\n", time_taken);
+        times[6] = time_taken;
+
+        printf("Test run for n=%d over.\n", upto);
+        printf("Writing results to csv.\n");
+
+        fprintf(fptr, "%d,", upto);  // %d = format int
+        int totalResultsLength = sizeof(times) / sizeof(times[0]);
+        for (int f = 0; f < totalResultsLength; f++)
+        {
+            fprintf(fptr, "%.6f", times[f]);
+            if (f < totalResultsLength -1) {
+                fprintf(fptr, ",");
+            }
+        }
+        fprintf(fptr, "\n");
+        printf("--------\n");
+    }
+    
+    fclose(fptr);
+
+    sleep_ms(500);
+    printf("Tests are done! Now it will call python3 (py in windows) to display graphs. I hope you've already created an venv and installed matplotlib and numpy!! \n");
+    sleep_ms(2500);
+
+    display_graph();
 
     return 0;
+}
+
+void display_graph() {
+    #ifdef _WIN32
+        system("rmdir /s /q venv");  // delete venv
+        system("py -m venv venv");
+        system("venv\\Scripts\\python -m pip install -r requirements.txt");
+        system("venv\\Scripts\\python graph.py");
+    #elif __APPLE__ || __linux__
+        system("rm -rf venv");  // delete broken venv
+        system("python3 -m venv venv");
+        system("source venv/bin/activate");
+        system("venv/bin/python3 -m pip install -r requirements.txt");
+        system("venv/bin/python3 graph.py");
+    #else
+        printf("Unsupported OS\n");
+    #endif
+    sleep_ms(500);
+    printf("Done! It should already have created a graph.png image in the current working directory.\n");
 }
 
 void basic_prime_gen(int **arr, int start, int upto)
@@ -124,9 +233,12 @@ void better_prime_gen(int **arr, int start, int upto)
 
 bool better_is_prime(int value)
 {
-    if (value < 2) {return false;}
+    if (value < 2)
+    {
+        return false;
+    }
 
-    for (int i = 2; i*i <= value; i++)
+    for (int i = 2; i * i <= value; i++)
     {
         if (value % i == 0)
         {
@@ -138,16 +250,21 @@ bool better_is_prime(int value)
 
 void cached_prime_gen(int **cache, int **arr, int start, int upto)
 {
-    for (int i = start; i <= upto; i++) {
-        if(cached_is_prime(cache, i)) {
-            arrput(*arr,i);
+    for (int i = start; i <= upto; i++)
+    {
+        if (cached_is_prime(cache, i))
+        {
+            arrput(*arr, i);
         }
     }
 }
 
 bool cached_is_prime(int **cache, int value)
 {
-    if (value < 2) {return false;}
+    if (value < 2)
+    {
+        return false;
+    }
 
     for (int i = 2; i * i <= value; i++)
     {
@@ -156,7 +273,7 @@ bool cached_is_prime(int **cache, int value)
         {
             // compute primality of i and store it
             bool is_prime = true;
-            for (int j = 2; j*j <= i; j++)
+            for (int j = 2; j * j <= i; j++)
             {
                 if (i % j == 0)
                 {
@@ -225,11 +342,12 @@ void pritchard_prime_gen(int **results, int n)
 
     // use bool arr instead of int. W[x] == true means its a candidate
     bool *W = NULL;
-    arrsetlen(W, n+1);
-    for (int i=0; i<(n+1); i++) {
+    arrsetlen(W, n + 1);
+    for (int i = 0; i < (n + 1); i++)
+    {
         W[i] = false;
     }
-    W[1]=true;
+    W[1] = true;
 
     int length = 2;
     int p = 3;      // p = pk+1 (p is always the next prime we are about to process)
@@ -239,12 +357,12 @@ void pritchard_prime_gen(int **results, int n)
     while (p * p <= n)
     {
         // step 2: extend W up to min(p * length, n)
-        long long new_length_64bit = (long long)p*(long long)length;
+        long long new_length_64bit = (long long)p * (long long)length;
         int new_length = (new_length_64bit > n) ? n : (int)new_length_64bit;
 
         for (int i = 1; i <= length; i++)
         {
-            if (W[i])  // is candidate
+            if (W[i]) // is candidate
             {
                 for (int k = i; k <= new_length; k += length)
                 {
@@ -256,9 +374,11 @@ void pritchard_prime_gen(int **results, int n)
         length = new_length;
 
         // get rid of multiples of p
-        for (int w = p; w*p<= length; w++) {
-            if (W[w]) {
-                W[p*w] = false;
+        for (int w = p; w * p <= length; w++)
+        {
+            if (W[w])
+            {
+                W[p * w] = false;
             }
         }
 
@@ -266,21 +386,29 @@ void pritchard_prime_gen(int **results, int n)
 
         // find next p(next element thats bigger than 1 in the W arr)
         int found = 0;
-        for (int i=p+1; i<=length;i++) {
-            if (W[i]) {
+        for (int i = p + 1; i <= length; i++)
+        {
+            if (W[i])
+            {
                 p = i;
                 found = 1;
                 break;
             }
         }
-        if (!found) {break;}
+        if (!found)
+        {
+            break;
+        }
     }
 
     if (length < n)
     {
-        for (int i =1; i<= length; i++) {
-            if (W[i]) {
-                for (int k=i; k<= n; k+= length) {
+        for (int i = 1; i <= length; i++)
+        {
+            if (W[i])
+            {
+                for (int k = i; k <= n; k += length)
+                {
                     W[k] = true;
                 }
             }
@@ -288,27 +416,33 @@ void pritchard_prime_gen(int **results, int n)
         length = n;
     }
 
-    int *final =NULL;
+    int *final = NULL;
 
-    for (int i=2;i<=n;i++) {
-        if (W[i]) {
+    for (int i = 2; i <= n; i++)
+    {
+        if (W[i])
+        {
             arrput(final, i);
         }
     }
 
     // add missing primes from Pr
-    for (int i=0;i<arrlen(Pr);i++) {
+    for (int i = 0; i < arrlen(Pr); i++)
+    {
         int v = Pr[i];
         bool exists = false;
 
-        for (int j = 0; j < arrlen(final); j++){
-            if(final[j] == v) {
-                exists=true;
+        for (int j = 0; j < arrlen(final); j++)
+        {
+            if (final[j] == v)
+            {
+                exists = true;
                 break;
             }
         }
-        if (!exists) {
-            arrput(final,v);
+        if (!exists)
+        {
+            arrput(final, v);
         }
     }
 
