@@ -18,14 +18,17 @@ if not pathlib.Path("dist").exists():
     pathlib.Path.mkdir("dist")
 
 for name,platform in platforms.items():
+    graph_name = name.replace("main-", "graph-")
+
     print(f"Building for {name}.")
     os.system(f"zig cc src/main.c -o build/{name} -target {platform}")
+    os.system(f"zig cc src/graph.c src/pbPlots.c src/supportLib.c -o build/{graph_name} -target {platform}")
 
     print(f"Zipping release for {name}.")
 
     zip = zipfile.ZipFile(f"dist/{name}.zip", "w", zipfile.ZIP_DEFLATED)
     zip.write(f"build/{name}", name)
-    zip.write("graph.py")
+    zip.write(f"build/{graph_name}", graph_name)
     zip.close
 
 print("Done!")

@@ -6,9 +6,9 @@ It generates primes up to a limit.
 ## How To Run
 Extract the zip from the releases.
 
-Just run the executable, it does everything for you and at the end you should have a graph of all the algorithms.
+Just run the executable, it will write the results to a csv file. 
 
-You need to have python installed and available on PATH. Python venv creation and dependency management is handled automatically.
+To view graph run the program named graph-[OS]\-[CPU_ARCHITECTURE]\ after the main program has finished writing results to csv.
 
 
 ## Building

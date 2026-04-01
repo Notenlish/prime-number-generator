@@ -12,3 +12,5 @@ dist/
 build/
 results.csv
 graph.png
+graph_with_basic.png
+graph_without_basic.png

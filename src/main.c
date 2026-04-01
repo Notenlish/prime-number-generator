@@ -47,13 +47,10 @@ void sleep_ms(int milliseconds) { // cross-platform sleep function
 int main()
 {
     printf("Starting tests! Running from n=10k to n=1 million.\n");
-    sleep_ms(500);
-    printf("*PLEASE* make sure python is installed and accessible via PATH(ie it works when you type py on windows and python3 on mac/linux). Otherwise there could be errors.\n");
-    sleep_ms(4000);
 
     FILE *fptr;
     fptr = fopen("results.csv", "w");
-    fprintf(fptr, "upto,basic,better,cached,eratosthenes,pritchard,atkin,sundaram\n");
+    // fprintf(fptr, "upto,basic,better,cached,eratosthenes,pritchard,atkin,sundaram\n");
 
     clock_t start_time;
     clock_t end_time;
@@ -155,6 +152,9 @@ int main()
         int totalResultsLength = sizeof(times) / sizeof(times[0]);
         for (int f = 0; f < totalResultsLength; f++)
         {
+            if (times[f] == 0.000000) {
+                times[f] = 0.000001;  // so that the log scale does not get broken.
+            }
             fprintf(fptr, "%.6f", times[f]);
             if (f < totalResultsLength -1) {
                 fprintf(fptr, ",");
@@ -166,33 +166,11 @@ int main()
     
     fclose(fptr);
 
-    sleep_ms(500);
-    printf("Tests are done! Now it will call python3 (py in windows) to display graphs. I hope you've already created an venv and installed matplotlib and numpy!! \n");
-    sleep_ms(2500);
-
-    display_graph();
+    printf("Tests are done! Run the graph program to generate a graph. \n");
 
     return 0;
 }
 
-void display_graph() {
-    #ifdef _WIN32
-        system("rmdir /s /q venv");  // delete venv
-        system("py -m venv venv");
-        system("venv\\Scripts\\python -m pip install -r requirements.txt");
-        system("venv\\Scripts\\python graph.py");
-    #elif __APPLE__ || __linux__
-        system("rm -rf venv");  // delete broken venv
-        system("python3 -m venv venv");
-        system("source venv/bin/activate");
-        system("venv/bin/python3 -m pip install -r requirements.txt");
-        system("venv/bin/python3 graph.py");
-    #else
-        printf("Unsupported OS\n");
-    #endif
-    sleep_ms(500);
-    printf("Done! It should already have created a graph.png image in the current working directory.\n");
-}
 
 void basic_prime_gen(int **arr, int start, int upto)
 {
